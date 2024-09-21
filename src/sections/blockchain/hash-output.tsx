@@ -1,15 +1,30 @@
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 
-const HashOutput = ({ hash, status }: { hash: string; status?: boolean }) => {
+const HashOutput = ({
+  hash,
+  status,
+  title,
+}: {
+  hash: string;
+  status?: boolean;
+  title?: string;
+}) => {
   const backgroundColor =
     status === undefined ? "#f5f5f5" : status ? "green" : "red";
 
   return (
     <Stack>
-      <Typography variant="h6" component="h3" mt={4}>
-        Hash Output (SHA-256):
-      </Typography>
+      {title ? (
+        <Typography variant="body2" component="h3">
+          {title}
+        </Typography>
+      ) : (
+        <Typography variant="h6" component="h3">
+          Hash Output (SHA-256):
+        </Typography>
+      )}
+
       <Typography
         variant="body2"
         sx={{

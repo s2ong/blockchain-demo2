@@ -63,10 +63,12 @@ export const mine = ({
   nonce,
   blockNumber,
   data,
+  previous,
 }: {
   nonce: number;
   blockNumber: number;
   data: string;
+  previous?: string;
 }) => {
   const result: { nonce: number; hash: string; status?: string } = {
     nonce,
@@ -77,7 +79,9 @@ export const mine = ({
   for (let x = 0; x <= maximumNonce; x++) {
     currentNonce = x;
 
-    const blockData = `${blockNumber}${currentNonce}${data}`;
+    const blockData = previous
+      ? `${blockNumber}${currentNonce}${data}${previous}`
+      : `${blockNumber}${currentNonce}${data}`;
     const currentHash = sha256(blockData);
 
     // 상태 확인

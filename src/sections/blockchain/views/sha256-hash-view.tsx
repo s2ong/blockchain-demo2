@@ -34,15 +34,16 @@ const SHA256HashView = () => {
         <Stack>
           <TextField
             fullWidth
-            label="Enter Data"
+            label="Data"
             variant="outlined"
             value={input}
             onChange={handleInputChange}
-            margin="normal"
+            multiline
+            rows={3}
           />
-        </Stack>
 
-        <HashOutput hash={hash} />
+          <HashOutput hash={hash} />
+        </Stack>
       </Paper>
     </Container>
   );

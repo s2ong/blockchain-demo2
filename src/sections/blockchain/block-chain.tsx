@@ -1,30 +1,97 @@
-import { useCallback, useEffect, useState } from "react";
-
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-
+import React, {
+  useState,
+  useCallback,
+  ChangeEvent,
+  useMemo,
+  useEffect,
+} from "react";
+import {
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  TextField,
+  Stack,
+} from "@mui/material";
+import HashOutput from "./hash-output";
 import { mine, sha256, updateState } from "@/utils/blockchain";
 
-import HashOutput from "./hash-output";
+interface Block {
+  id: number;
+  chain: number;
+  nonce: number;
+  data: string;
+  previous: string;
+  hash?: string;
+  mining?: boolean;
+}
 
-const BlockChainForm = () => {
-  const [blockNumber, setBlockNumber] = useState(1);
-  const [nonce, setNonce] = useState(72608);
-  const [data, setData] = useState("");
-  const [hash, setHash] = useState("");
+interface BlockChainProps {
+  currentBlock: Block;
+  onChange: (block: Block) => void;
+}
+
+const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
+  const [block, setBlock] = useState(currentBlock);
   const [status, setStatus] = useState<string | undefined>();
   const [mining, setMining] = useState(false);
 
-  const calculateHash = useCallback(() => {
-    const blockData = `${blockNumber}${nonce}${data}`;
+  const isChain = status === "success";
+
+  const onUpdateHashStatus = (inputBlock: Block) => {
+    const hashStatus = updateState(inputBlock.hash || "");
+    console.log(hashStatus);
+    if (hashStatus === "valid") {
+      setStatus("success");
+    } else {
+      setStatus("failure");
+    }
+  };
+
+  useMemo(() => {
+    setBlock(currentBlock);
+  }, [currentBlock]);
+
+  useEffect(() => {
+    onUpdateHashStatus(currentBlock);
+  }, [currentBlock]);
+
+  const getBlockData = (block: Block) =>
+    `${block.id}${block.nonce}${block.data}${block.previous}`;
+
+  const handleMine = useCallback(() => {
+    setMining(true);
+
+    const miningResult = mine({
+      nonce: block.nonce,
+      blockNumber: block.id,
+      data: block.data,
+      previous: block.previous,
+    });
+
+    if (miningResult.status === "success") {
+      const newBlock = {
+        ...block,
+        nonce: miningResult.nonce,
+        hash: miningResult.hash,
+      };
+      setBlock(newBlock);
+      onChange(newBlock);
+    }
+    setStatus(miningResult?.status);
+    setMining(false);
+  }, [block, onChange]);
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+
+    const inputBlock = { ...block, [name]: value };
+
+    const blockData = getBlockData(inputBlock);
 
     const hashValue = sha256(blockData);
-    setHash(hashValue);
 
     const hashStatus = updateState(hashValue);
     if (hashStatus === "valid") {
@@ -32,75 +99,49 @@ const BlockChainForm = () => {
     } else {
       setStatus("failure");
     }
-  }, [blockNumber, data, nonce]);
 
-  const handleMine = useCallback(() => {
-    setMining(true);
+    setBlock({ ...inputBlock, hash: hashValue });
 
-    const miningResult = mine({ nonce, blockNumber, data });
-
-    if (miningResult.status === "success") {
-      setNonce(miningResult.nonce);
-      setHash(miningResult.hash);
-    }
-    setStatus(miningResult?.status);
-    setMining(false);
-  }, [blockNumber, data, nonce]);
-
-  useEffect(() => {
-    calculateHash();
-  }, [blockNumber, data, nonce, calculateHash]);
-
-  const isChain = status === "success";
+    onChange({ ...inputBlock, hash: hashValue });
+  };
 
   return (
-    <Container>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Blockchian
-      </Typography>
-      <Paper sx={{ p: 2 }}>
+    <Card sx={{ width: 400, flexShrink: 0 }}>
+      <CardContent>
         <Stack spacing={2}>
           <TextField
-            fullWidth
             label="Block Number"
-            variant="outlined"
-            type="number"
-            value={blockNumber}
-            onChange={(e) => setBlockNumber(Number(e.target.value))}
+            name="id"
+            value={block.id}
+            onChange={handleChange}
+            fullWidth
           />
           <TextField
-            fullWidth
             label="Nonce"
-            variant="outlined"
-            type="number"
-            value={nonce}
-            onChange={(e) => setNonce(Number(e.target.value))}
+            name="nonce"
+            value={block.nonce}
+            onChange={handleChange}
+            fullWidth
           />
           <TextField
-            fullWidth
             label="Data"
-            variant="outlined"
-            value={data}
-            onChange={(e) => setData(e.target.value)}
+            name="data"
+            value={block.data}
+            onChange={handleChange}
             multiline
             rows={3}
           />
-
-          <HashOutput hash={hash} status={isChain} />
-
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleMine}
-            disabled={mining}
-          >
-            {mining ? <CircularProgress size={24} /> : "채굴"}
-          </Button>
+          <HashOutput hash={block?.previous} title="Previous Hash" />
+          <HashOutput hash={block?.hash || ""} status={isChain} title="Hash" />
         </Stack>
-      </Paper>
-    </Container>
+      </CardContent>
+      <CardActions>
+        <Button onClick={handleMine}>
+          {mining ? "Mining..." : "Mine Block"}
+        </Button>
+      </CardActions>
+    </Card>
   );
 };
 
-export default BlockChainForm;
+export default BlockChain;
