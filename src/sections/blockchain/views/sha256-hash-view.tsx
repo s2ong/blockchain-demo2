@@ -7,6 +7,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
 import { calculateHash } from "@/utils/blockchain";
+
 import HashOutput from "../hash-output";
 
 const SHA256HashView = () => {

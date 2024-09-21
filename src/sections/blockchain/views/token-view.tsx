@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 
-import { TOKENS } from "@/_mock/_token";
+import { TOKENS } from "@/_mock/_blockchain";
 
 import {
   getTransactionsString,

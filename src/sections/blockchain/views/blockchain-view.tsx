@@ -7,7 +7,7 @@ import Stack from "@mui/material/Stack";
 
 import { sha256 } from "@/utils/blockchain";
 
-import { BLOCKS } from "@/_mock/_block";
+import { BLOCKS } from "@/_mock/_blockchain";
 
 import { IBlock } from "@/types/blockchain";
 

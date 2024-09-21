@@ -1,54 +1,65 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 
-import { BLOCKS } from "@/_mock/_blockchain";
+import { COINS } from "@/_mock/_blockchain";
 
-import { IBlock } from "@/types/blockchain";
+import {
+  getTransactionsString,
+  recalculateTokenBlcokChain,
+  sha256,
+} from "@/utils/blockchain";
 
-import { recalculateBlcokChain, sha256 } from "@/utils/blockchain";
+import { ITokenBlock } from "@/types/blockchain";
 
-import BlockChain from "../block-chain";
+import TokenBlockChain from "../token-block-chain";
 
-const DistributedView = () => {
+const CoinbaseView = () => {
+  const tokens1 = COINS(1);
+  const tokens2 = COINS(2);
+  const tokens3 = COINS(3);
+
   return (
     <Container>
       <Typography variant="h4" component="h1" gutterBottom>
-        Distributed
+        Token
       </Typography>
 
       <Stack spacing={1}>
-        <PeerBlockChain peerName="Peer A" initialBlocks={BLOCKS} />
+        <PeerTokenChain peerName="Peer A" initialBlocks={tokens1} />
 
-        <PeerBlockChain peerName="Peer B" initialBlocks={BLOCKS} />
+        <PeerTokenChain peerName="Peer B" initialBlocks={tokens2} />
 
-        <PeerBlockChain peerName="Peer C" initialBlocks={BLOCKS} />
+        <PeerTokenChain peerName="Peer C" initialBlocks={tokens3} />
       </Stack>
     </Container>
   );
 };
 
-export default DistributedView;
+export default CoinbaseView;
 
-const PeerBlockChain = ({
+const PeerTokenChain = ({
   peerName,
   initialBlocks,
 }: {
   peerName: string;
-  initialBlocks: IBlock[];
+  initialBlocks: ITokenBlock[];
 }) => {
   const [blocks, setBlocks] = useState(initialBlocks);
 
-  const initializeHashes = (initialBlocks: IBlock[]) => {
+  const initializeHashes = (initialBlocks: ITokenBlock[]) => {
     const updatedBlocks = [...initialBlocks];
     for (let i = 0; i < updatedBlocks.length; i++) {
       const previousHash =
         i === 0
           ? "0000000000000000000000000000000000000000000000000000000000000000"
           : updatedBlocks[i - 1].hash || "";
-      const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${updatedBlocks[i].data}${previousHash}`;
+
+      const data = getTransactionsString(updatedBlocks[i].data);
+      const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${data}${previousHash}`;
       const newHash = sha256(blockData).toString();
 
       updatedBlocks[i] = {
@@ -65,7 +76,7 @@ const PeerBlockChain = ({
     setBlocks(blocksWithHashes);
   }, [initialBlocks]);
 
-  const handleUpdate = (updatedBlock: IBlock) => {
+  const handleUpdate = (updatedBlock: ITokenBlock) => {
     const updatedBlocks = [...blocks];
     const blockIndex = updatedBlocks.findIndex(
       (block) => block.id === updatedBlock.id
@@ -73,10 +84,12 @@ const PeerBlockChain = ({
 
     if (blockIndex !== -1) {
       updatedBlocks[blockIndex] = { ...updatedBlock };
-      const recalculatedBlocks = recalculateBlcokChain(
+
+      const recalculatedBlocks = recalculateTokenBlcokChain(
         updatedBlocks,
         blockIndex
       );
+
       setBlocks(recalculatedBlocks);
     }
   };
@@ -88,8 +101,8 @@ const PeerBlockChain = ({
       </Typography>
       <Stack spacing={2} direction="row" sx={{ overflow: "auto", pb: 1 }}>
         {blocks.map((block, index) => (
-          <BlockChain
-            key={index}
+          <TokenBlockChain
+            key={block.id}
             currentBlock={block}
             onChange={handleUpdate}
           />
