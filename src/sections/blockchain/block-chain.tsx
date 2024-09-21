@@ -13,22 +13,16 @@ import {
   TextField,
   Stack,
 } from "@mui/material";
-import HashOutput from "./hash-output";
+
+import { IBlock } from "@/types/block";
+
 import { mine, sha256, updateState } from "@/utils/blockchain";
 
-interface Block {
-  id: number;
-  chain: number;
-  nonce: number;
-  data: string;
-  previous: string;
-  hash?: string;
-  mining?: boolean;
-}
+import HashOutput from "./hash-output";
 
 interface BlockChainProps {
-  currentBlock: Block;
-  onChange: (block: Block) => void;
+  currentBlock: IBlock;
+  onChange: (block: IBlock) => void;
 }
 
 const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
@@ -38,7 +32,7 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
 
   const isChain = status === "success";
 
-  const onUpdateHashStatus = (inputBlock: Block) => {
+  const onUpdateHashStatus = (inputBlock: IBlock) => {
     const hashStatus = updateState(inputBlock.hash || "");
     console.log(hashStatus);
     if (hashStatus === "valid") {
@@ -56,7 +50,7 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
     onUpdateHashStatus(currentBlock);
   }, [currentBlock]);
 
-  const getBlockData = (block: Block) =>
+  const getBlockData = (block: IBlock) =>
     `${block.id}${block.nonce}${block.data}${block.previous}`;
 
   const handleMine = useCallback(() => {
@@ -136,7 +130,7 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
         </Stack>
       </CardContent>
       <CardActions>
-        <Button onClick={handleMine}>
+        <Button onClick={handleMine} variant="contained" fullWidth>
           {mining ? "Mining..." : "Mine Block"}
         </Button>
       </CardActions>

@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import SHA256HashView from "@/sections/blockchain/views/sha256-hash-view";
 import BlockView from "@/sections/blockchain/views/block-view";
 import BlockChainView from "@/sections/blockchain/views/blockchain-view";
+import DistributedView from "@/sections/blockchain/views/distributed-view";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,6 +56,7 @@ export default function BlockchainPage() {
           <Tab label="해시" {...a11yProps(0)} />
           <Tab label="블록" {...a11yProps(1)} />
           <Tab label="블록체인" {...a11yProps(2)} />
+          <Tab label="분산" {...a11yProps(3)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -65,6 +67,9 @@ export default function BlockchainPage() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         <BlockChainView />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={3}>
+        <DistributedView />
       </CustomTabPanel>
     </Box>
   );

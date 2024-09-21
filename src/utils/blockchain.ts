@@ -1,3 +1,4 @@
+import { IBlock } from "@/types/block";
 import CryptoJS from "crypto-js";
 /////////////////////////
 // global variable setup
@@ -101,4 +102,25 @@ export const mine = ({
   }
 
   return result;
+};
+
+export const recalculateBlcokChain = (
+  updatedBlocks: IBlock[],
+  startIndex: number
+) => {
+  for (let i = startIndex; i < updatedBlocks.length; i++) {
+    const previousHash =
+      i === 0
+        ? "0000000000000000000000000000000000000000000000000000000000000000"
+        : updatedBlocks[i - 1].hash || "";
+    const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${updatedBlocks[i].data}${previousHash}`;
+    const newHash = sha256(blockData).toString();
+
+    updatedBlocks[i] = {
+      ...updatedBlocks[i],
+      previous: previousHash,
+      hash: newHash,
+    };
+  }
+  return updatedBlocks;
 };
