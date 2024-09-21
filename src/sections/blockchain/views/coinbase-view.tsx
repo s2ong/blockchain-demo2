@@ -7,15 +7,11 @@ import Paper from "@mui/material/Paper";
 
 import { COINS } from "@/_mock/_blockchain";
 
-import {
-  getTransactionsString,
-  recalculateTokenBlcokChain,
-  sha256,
-} from "@/utils/blockchain";
+import { recalculateCoinBlockChain } from "@/utils/blockchain";
 
-import { ITokenBlock } from "@/types/blockchain";
+import { ICoinBlock } from "@/types/blockchain";
 
-import TokenBlockChain from "../token-block-chain";
+import CoinBlockChain from "../coin-block-chain";
 
 const CoinbaseView = () => {
   const tokens1 = COINS(1);
@@ -25,7 +21,7 @@ const CoinbaseView = () => {
   return (
     <Container>
       <Typography variant="h4" component="h1" gutterBottom>
-        Token
+        Coinbase
       </Typography>
 
       <Stack spacing={1}>
@@ -46,37 +42,21 @@ const PeerTokenChain = ({
   initialBlocks,
 }: {
   peerName: string;
-  initialBlocks: ITokenBlock[];
+  initialBlocks: ICoinBlock[];
 }) => {
   const [blocks, setBlocks] = useState(initialBlocks);
 
-  const initializeHashes = (initialBlocks: ITokenBlock[]) => {
+  const initializeHashes = (initialBlocks: ICoinBlock[]) => {
     const updatedBlocks = [...initialBlocks];
-    for (let i = 0; i < updatedBlocks.length; i++) {
-      const previousHash =
-        i === 0
-          ? "0000000000000000000000000000000000000000000000000000000000000000"
-          : updatedBlocks[i - 1].hash || "";
-
-      const data = getTransactionsString(updatedBlocks[i].data);
-      const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${data}${previousHash}`;
-      const newHash = sha256(blockData).toString();
-
-      updatedBlocks[i] = {
-        ...updatedBlocks[i],
-        previous: previousHash,
-        hash: newHash,
-      };
-    }
-    return updatedBlocks;
+    const result = recalculateCoinBlockChain(updatedBlocks);
+    setBlocks(result);
   };
 
   useEffect(() => {
-    const blocksWithHashes = initializeHashes(initialBlocks);
-    setBlocks(blocksWithHashes);
+    initializeHashes(initialBlocks);
   }, [initialBlocks]);
 
-  const handleUpdate = (updatedBlock: ITokenBlock) => {
+  const handleUpdate = (updatedBlock: ICoinBlock) => {
     const updatedBlocks = [...blocks];
     const blockIndex = updatedBlocks.findIndex(
       (block) => block.id === updatedBlock.id
@@ -85,7 +65,7 @@ const PeerTokenChain = ({
     if (blockIndex !== -1) {
       updatedBlocks[blockIndex] = { ...updatedBlock };
 
-      const recalculatedBlocks = recalculateTokenBlcokChain(
+      const recalculatedBlocks = recalculateCoinBlockChain(
         updatedBlocks,
         blockIndex
       );
@@ -101,7 +81,7 @@ const PeerTokenChain = ({
       </Typography>
       <Stack spacing={2} direction="row" sx={{ overflow: "auto", pb: 1 }}>
         {blocks.map((block, index) => (
-          <TokenBlockChain
+          <CoinBlockChain
             key={block.id}
             currentBlock={block}
             onChange={handleUpdate}

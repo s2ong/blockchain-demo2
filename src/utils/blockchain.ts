@@ -1,4 +1,9 @@
-import { IBlock, ITokenBlock, ITokenBlockTxs } from "@/types/blockchain";
+import {
+  IBlock,
+  ICoinBlock,
+  ITokenBlock,
+  ITokenBlockTxs,
+} from "@/types/blockchain";
 import CryptoJS from "crypto-js";
 /////////////////////////
 // global variable setup
@@ -104,16 +109,27 @@ export const mine = ({
   return result;
 };
 
-export const recalculateBlcokChain = (
-  updatedBlocks: IBlock[],
-  startIndex: number
+interface IBlockBase {
+  id: number;
+  nonce: number;
+  hash?: string;
+  data?: string | any[];
+}
+
+const calculateBlockchain = <T extends IBlockBase>(
+  updatedBlocks: T[],
+  startIndex: number = 0,
+  getBlockData: (block: T) => string
 ) => {
   for (let i = startIndex; i < updatedBlocks.length; i++) {
     const previousHash =
       i === 0
         ? "0000000000000000000000000000000000000000000000000000000000000000"
         : updatedBlocks[i - 1].hash || "";
-    const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${updatedBlocks[i].data}${previousHash}`;
+
+    const blockData = `${updatedBlocks[i].id}${
+      updatedBlocks[i].nonce
+    }${getBlockData(updatedBlocks[i])}${previousHash}`;
     const newHash = sha256(blockData).toString();
 
     updatedBlocks[i] = {
@@ -125,7 +141,7 @@ export const recalculateBlcokChain = (
   return updatedBlocks;
 };
 
-export const getTransactionsString = (txs: ITokenBlockTxs[]) => {
+export const getTokenString = (txs: ITokenBlockTxs[]) => {
   let data = "";
   txs.forEach((tx) => {
     data = `${data}${tx.value}${tx.from}${tx.to}`;
@@ -133,25 +149,42 @@ export const getTransactionsString = (txs: ITokenBlockTxs[]) => {
   return data;
 };
 
-export const recalculateTokenBlcokChain = (
-  updatedBlocks: ITokenBlock[],
-  startIndex: number
+export const getCointString = (block: ICoinBlock) => {
+  let data = `${block.coinbasevalue}${block.coinbaseto}`;
+  block.txs.forEach((tx) => {
+    data = `${data}${tx.value}${tx.from}${tx.to}`;
+  });
+  return data;
+};
+
+// 일반적인 블록체인의 데이터 처리 함수
+export const recalculateBlockChain = (
+  updatedBlocks: IBlock[],
+  startIndex: number = 0
 ) => {
-  for (let i = startIndex; i < updatedBlocks.length; i++) {
-    const previousHash =
-      i === 0
-        ? "0000000000000000000000000000000000000000000000000000000000000000"
-        : updatedBlocks[i - 1].hash || "";
+  return calculateBlockchain<IBlock>(
+    updatedBlocks,
+    startIndex,
+    (block) => block.data
+  );
+};
 
-    const data = getTransactionsString(updatedBlocks[i].data);
-    const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${data}${previousHash}`;
-    const newHash = sha256(blockData).toString();
+// 토큰 블록체인의 데이터 처리 함수
+export const recalculateTokenBlockChain = (
+  updatedBlocks: ITokenBlock[],
+  startIndex: number = 0
+) => {
+  return calculateBlockchain<ITokenBlock>(updatedBlocks, startIndex, (block) =>
+    getTokenString(block.data)
+  );
+};
 
-    updatedBlocks[i] = {
-      ...updatedBlocks[i],
-      previous: previousHash,
-      hash: newHash,
-    };
-  }
-  return updatedBlocks;
+// 코인 블록체인의 데이터 처리 함수
+export const recalculateCoinBlockChain = (
+  updatedBlocks: ICoinBlock[],
+  startIndex: number = 0
+) => {
+  return calculateBlockchain<ICoinBlock>(updatedBlocks, startIndex, (block) =>
+    getCointString(block)
+  );
 };

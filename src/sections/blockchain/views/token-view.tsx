@@ -7,11 +7,7 @@ import Paper from "@mui/material/Paper";
 
 import { TOKENS } from "@/_mock/_blockchain";
 
-import {
-  getTransactionsString,
-  recalculateTokenBlcokChain,
-  sha256,
-} from "@/utils/blockchain";
+import { recalculateTokenBlockChain } from "@/utils/blockchain";
 
 import { ITokenBlock } from "@/types/blockchain";
 
@@ -52,28 +48,12 @@ const PeerTokenChain = ({
 
   const initializeHashes = (initialBlocks: ITokenBlock[]) => {
     const updatedBlocks = [...initialBlocks];
-    for (let i = 0; i < updatedBlocks.length; i++) {
-      const previousHash =
-        i === 0
-          ? "0000000000000000000000000000000000000000000000000000000000000000"
-          : updatedBlocks[i - 1].hash || "";
-
-      const data = getTransactionsString(updatedBlocks[i].data);
-      const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${data}${previousHash}`;
-      const newHash = sha256(blockData).toString();
-
-      updatedBlocks[i] = {
-        ...updatedBlocks[i],
-        previous: previousHash,
-        hash: newHash,
-      };
-    }
-    return updatedBlocks;
+    const recalculatedBlocks = recalculateTokenBlockChain(updatedBlocks);
+    setBlocks(recalculatedBlocks);
   };
 
   useEffect(() => {
-    const blocksWithHashes = initializeHashes(initialBlocks);
-    setBlocks(blocksWithHashes);
+    initializeHashes(initialBlocks);
   }, [initialBlocks]);
 
   const handleUpdate = (updatedBlock: ITokenBlock) => {
@@ -85,7 +65,7 @@ const PeerTokenChain = ({
     if (blockIndex !== -1) {
       updatedBlocks[blockIndex] = { ...updatedBlock };
 
-      const recalculatedBlocks = recalculateTokenBlcokChain(
+      const recalculatedBlocks = recalculateTokenBlockChain(
         updatedBlocks,
         blockIndex
       );

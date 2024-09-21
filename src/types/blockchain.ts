@@ -21,5 +21,15 @@ export type ITokenBlock = {
   data: ITokenBlockTxs[];
   previous: string;
   hash?: string;
-  mining?: boolean;
+};
+
+export type ICoinBlock = {
+  id: number;
+  chain: number;
+  nonce: number;
+  coinbasevalue: string;
+  coinbaseto: string;
+  txs: ITokenBlockTxs[];
+  previous: string;
+  hash?: string;
 };

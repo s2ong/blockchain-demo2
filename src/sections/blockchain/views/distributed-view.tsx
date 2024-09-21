@@ -8,7 +8,7 @@ import { BLOCKS } from "@/_mock/_blockchain";
 
 import { IBlock } from "@/types/blockchain";
 
-import { recalculateBlcokChain, sha256 } from "@/utils/blockchain";
+import { recalculateBlockChain, sha256 } from "@/utils/blockchain";
 
 import BlockChain from "../block-chain";
 
@@ -73,7 +73,7 @@ const PeerBlockChain = ({
 
     if (blockIndex !== -1) {
       updatedBlocks[blockIndex] = { ...updatedBlock };
-      const recalculatedBlocks = recalculateBlcokChain(
+      const recalculatedBlocks = recalculateBlockChain(
         updatedBlocks,
         blockIndex
       );

@@ -15,19 +15,19 @@ import {
   Typography,
 } from "@mui/material";
 
-import { IBlock, ITokenBlock, ITokenBlockTxs } from "@/types/blockchain";
+import { IBlock, ICoinBlock, ITokenBlockTxs } from "@/types/blockchain";
 
-import { getTokenString, mine, sha256, updateState } from "@/utils/blockchain";
+import { getCointString, mine, sha256, updateState } from "@/utils/blockchain";
 
 import HashOutput from "./hash-output";
 import TokenBlockChainItem from "./token-block-chain-item";
 
 interface BlockChainProps {
-  currentBlock: ITokenBlock;
-  onChange: (block: ITokenBlock) => void;
+  currentBlock: ICoinBlock;
+  onChange: (block: ICoinBlock) => void;
 }
 
-const TokenBlockChain: React.FC<BlockChainProps> = ({
+const CoinBlockChain: React.FC<BlockChainProps> = ({
   currentBlock,
   onChange,
 }) => {
@@ -37,7 +37,7 @@ const TokenBlockChain: React.FC<BlockChainProps> = ({
 
   const isChain = status === "success";
 
-  const onUpdateHashStatus = (inputBlock: ITokenBlock) => {
+  const onUpdateHashStatus = (inputBlock: ICoinBlock) => {
     const hashStatus = updateState(inputBlock.hash || "");
     if (hashStatus === "valid") {
       setStatus("success");
@@ -54,14 +54,8 @@ const TokenBlockChain: React.FC<BlockChainProps> = ({
     onUpdateHashStatus(currentBlock);
   }, [currentBlock]);
 
-  const getBlockData = (block: IBlock) => {
-    return `${block.id}${block.nonce}${block.data}${block.previous}`;
-  };
-
-  const calculateBlock = (inputBlock: ITokenBlock) => {
-    const data = getTokenString(inputBlock.data);
-
-    const blockData = getBlockData({ ...inputBlock, data });
+  const calculateBlock = (inputBlock: ICoinBlock) => {
+    const blockData = getCointString(inputBlock);
 
     const hashValue = sha256(blockData);
 
@@ -79,7 +73,7 @@ const TokenBlockChain: React.FC<BlockChainProps> = ({
   const handleMine = useCallback(() => {
     setMining(true);
 
-    const data = getTokenString(block.data);
+    const data = getCointString(block);
 
     const miningResult = mine({
       nonce: block.nonce,
@@ -120,7 +114,7 @@ const TokenBlockChain: React.FC<BlockChainProps> = ({
     updateTransactions: ITokenBlockTxs
   ) => {
     const updatedBlock = { ...currentBlock };
-    updatedBlock.data[txsIndex] = updateTransactions;
+    updatedBlock.txs[txsIndex] = updateTransactions;
 
     const blockData = calculateBlock(updatedBlock);
 
@@ -148,9 +142,26 @@ const TokenBlockChain: React.FC<BlockChainProps> = ({
             fullWidth
           />
           <Typography variant="body2" component="h1" gutterBottom>
+            코인베이스
+          </Typography>
+          <Stack direction="row" justifyContent="space-between" spacing={1}>
+            <TextField
+              label="₩"
+              name="coinbasevalue"
+              value={block.coinbasevalue}
+              onChange={handleChange}
+            />
+            <TextField
+              label="보낸이"
+              name="coinbaseto"
+              value={block.coinbaseto}
+              onChange={handleChange}
+            />
+          </Stack>
+          <Typography variant="body2" component="h1" gutterBottom>
             송금
           </Typography>
-          {block.data.map((txs, index) => (
+          {block.txs.map((txs, index) => (
             <TokenBlockChainItem
               key={`${block.id}-${index}`}
               txs={txs}
@@ -172,4 +183,4 @@ const TokenBlockChain: React.FC<BlockChainProps> = ({
   );
 };
 
-export default TokenBlockChain;
+export default CoinBlockChain;
