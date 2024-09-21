@@ -9,7 +9,7 @@ import { sha256 } from "@/utils/blockchain";
 
 import { BLOCKS } from "@/_mock/_block";
 
-import { IBlock } from "@/types/block";
+import { IBlock } from "@/types/blockchain";
 
 import BlockChain from "../block-chain";
 

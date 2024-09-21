@@ -1,4 +1,4 @@
-import { IBlock } from "@/types/block";
+import { IBlock, ITokenBlock, ITokenBlockTxs } from "@/types/blockchain";
 import CryptoJS from "crypto-js";
 /////////////////////////
 // global variable setup
@@ -114,6 +114,37 @@ export const recalculateBlcokChain = (
         ? "0000000000000000000000000000000000000000000000000000000000000000"
         : updatedBlocks[i - 1].hash || "";
     const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${updatedBlocks[i].data}${previousHash}`;
+    const newHash = sha256(blockData).toString();
+
+    updatedBlocks[i] = {
+      ...updatedBlocks[i],
+      previous: previousHash,
+      hash: newHash,
+    };
+  }
+  return updatedBlocks;
+};
+
+export const getTransactionsString = (txs: ITokenBlockTxs[]) => {
+  let data = "";
+  txs.forEach((tx) => {
+    data = `${data}${tx.value}${tx.from}${tx.to}`;
+  });
+  return data;
+};
+
+export const recalculateTokenBlcokChain = (
+  updatedBlocks: ITokenBlock[],
+  startIndex: number
+) => {
+  for (let i = startIndex; i < updatedBlocks.length; i++) {
+    const previousHash =
+      i === 0
+        ? "0000000000000000000000000000000000000000000000000000000000000000"
+        : updatedBlocks[i - 1].hash || "";
+
+    const data = getTransactionsString(updatedBlocks[i].data);
+    const blockData = `${updatedBlocks[i].id}${updatedBlocks[i].nonce}${data}${previousHash}`;
     const newHash = sha256(blockData).toString();
 
     updatedBlocks[i] = {

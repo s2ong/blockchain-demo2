@@ -8,6 +8,7 @@ import SHA256HashView from "@/sections/blockchain/views/sha256-hash-view";
 import BlockView from "@/sections/blockchain/views/block-view";
 import BlockChainView from "@/sections/blockchain/views/blockchain-view";
 import DistributedView from "@/sections/blockchain/views/distributed-view";
+import TokenView from "@/sections/blockchain/views/token-view";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -57,6 +58,7 @@ export default function BlockchainPage() {
           <Tab label="블록" {...a11yProps(1)} />
           <Tab label="블록체인" {...a11yProps(2)} />
           <Tab label="분산" {...a11yProps(3)} />
+          <Tab label="토큰" {...a11yProps(4)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -70,6 +72,9 @@ export default function BlockchainPage() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
         <DistributedView />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={4}>
+        <TokenView />
       </CustomTabPanel>
     </Box>
   );

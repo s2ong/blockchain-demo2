@@ -12,29 +12,38 @@ import {
   Button,
   TextField,
   Stack,
+  Typography,
 } from "@mui/material";
 
-import { IBlock } from "@/types/blockchain";
+import { IBlock, ITokenBlock, ITokenBlockTxs } from "@/types/blockchain";
 
-import { mine, sha256, updateState } from "@/utils/blockchain";
+import {
+  getTransactionsString,
+  mine,
+  sha256,
+  updateState,
+} from "@/utils/blockchain";
 
 import HashOutput from "./hash-output";
+import TokenBlockChainItem from "./token-block-chain-item";
 
 interface BlockChainProps {
-  currentBlock: IBlock;
-  onChange: (block: IBlock) => void;
+  currentBlock: ITokenBlock;
+  onChange: (block: ITokenBlock) => void;
 }
 
-const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
+const TokenBlockChain: React.FC<BlockChainProps> = ({
+  currentBlock,
+  onChange,
+}) => {
   const [block, setBlock] = useState(currentBlock);
   const [status, setStatus] = useState<string | undefined>();
   const [mining, setMining] = useState(false);
 
   const isChain = status === "success";
 
-  const onUpdateHashStatus = (inputBlock: IBlock) => {
+  const onUpdateHashStatus = (inputBlock: ITokenBlock) => {
     const hashStatus = updateState(inputBlock.hash || "");
-
     if (hashStatus === "valid") {
       setStatus("success");
     } else {
@@ -50,16 +59,37 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
     onUpdateHashStatus(currentBlock);
   }, [currentBlock]);
 
-  const getBlockData = (block: IBlock) =>
-    `${block.id}${block.nonce}${block.data}${block.previous}`;
+  const getBlockData = (block: IBlock) => {
+    return `${block.id}${block.nonce}${block.data}${block.previous}`;
+  };
+
+  const calculateBlock = (inputBlock: ITokenBlock) => {
+    const data = getTransactionsString(inputBlock.data);
+
+    const blockData = getBlockData({ ...inputBlock, data });
+
+    const hashValue = sha256(blockData);
+
+    const hashStatus = updateState(hashValue);
+
+    if (hashStatus === "valid") {
+      setStatus("success");
+    } else {
+      setStatus("failure");
+    }
+
+    return { ...inputBlock, hash: hashValue };
+  };
 
   const handleMine = useCallback(() => {
     setMining(true);
 
+    const data = getTransactionsString(block.data);
+
     const miningResult = mine({
       nonce: block.nonce,
       blockNumber: block.id,
-      data: block.data,
+      data,
       previous: block.previous,
     });
 
@@ -83,20 +113,25 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
 
     const inputBlock = { ...block, [name]: value };
 
-    const blockData = getBlockData(inputBlock);
+    const blockData = calculateBlock(inputBlock);
 
-    const hashValue = sha256(blockData);
+    setBlock(blockData);
 
-    const hashStatus = updateState(hashValue);
-    if (hashStatus === "valid") {
-      setStatus("success");
-    } else {
-      setStatus("failure");
-    }
+    onChange(blockData);
+  };
 
-    setBlock({ ...inputBlock, hash: hashValue });
+  const handleChangeTransaction = (
+    txsIndex: number,
+    updateTransactions: ITokenBlockTxs
+  ) => {
+    const updatedBlock = { ...currentBlock };
+    updatedBlock.data[txsIndex] = updateTransactions;
 
-    onChange({ ...inputBlock, hash: hashValue });
+    const blockData = calculateBlock(updatedBlock);
+
+    setBlock(blockData);
+
+    onChange(blockData);
   };
 
   return (
@@ -117,14 +152,18 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
             onChange={handleChange}
             fullWidth
           />
-          <TextField
-            label="Data"
-            name="data"
-            value={block.data}
-            onChange={handleChange}
-            multiline
-            rows={3}
-          />
+          <Typography variant="body2" component="h1" gutterBottom>
+            송금
+          </Typography>
+          {block.data.map((txs, index) => (
+            <TokenBlockChainItem
+              key={`${block.id}-${index}`}
+              txs={txs}
+              txsIndex={index}
+              onChange={handleChangeTransaction}
+            />
+          ))}
+
           <HashOutput hash={block?.previous} title="Previous Hash" />
           <HashOutput hash={block?.hash || ""} status={isChain} title="Hash" />
         </Stack>
@@ -138,4 +177,4 @@ const BlockChain: React.FC<BlockChainProps> = ({ currentBlock, onChange }) => {
   );
 };
 
-export default BlockChain;
+export default TokenBlockChain;
