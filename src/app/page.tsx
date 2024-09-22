@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import { ec } from "elliptic";
+
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+
+import { generateKeysInDecimal } from "@/utils/keygen";
+
 import SHA256HashView from "@/sections/blockchain/views/sha256-hash-view";
 import BlockView from "@/sections/blockchain/views/block-view";
 import BlockChainView from "@/sections/blockchain/views/blockchain-view";
@@ -12,8 +18,7 @@ import TokenView from "@/sections/blockchain/views/token-view";
 import CoinbaseView from "@/sections/blockchain/views/coinbase-view";
 import KeysView from "@/sections/signatures/views/keys-view";
 import SignatureView from "@/sections/signatures/views/signature-view";
-import { generateKeysInDecimal } from "@/utils/keygen";
-import { ec } from "elliptic";
+import TransactionView from "@/sections/signatures/views/transaction-view";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -89,6 +94,7 @@ export default function BlockchainPage() {
           <Tab label="코인베이스" {...a11yProps(5)} />
           <Tab label="공개키와 개인키" {...a11yProps(6)} />
           <Tab label="서명" {...a11yProps(7)} disabled={disabledKey} />
+          <Tab label="거래" {...a11yProps(8)} disabled={disabledKey} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -115,6 +121,9 @@ export default function BlockchainPage() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={7}>
         <SignatureView keys={keys} keyPair={genKeyPair} />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={8}>
+        <TransactionView keys={keys} keyPair={genKeyPair} />
       </CustomTabPanel>
     </Box>
   );
