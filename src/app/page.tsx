@@ -19,6 +19,7 @@ import CoinbaseView from "@/sections/blockchain/views/coinbase-view";
 import KeysView from "@/sections/signatures/views/keys-view";
 import SignatureView from "@/sections/signatures/views/signature-view";
 import TransactionView from "@/sections/signatures/views/transaction-view";
+import BitcoinView from "@/sections/signatures/views/bitcoin-view";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -95,6 +96,7 @@ export default function BlockchainPage() {
           <Tab label="공개키와 개인키" {...a11yProps(6)} />
           <Tab label="서명" {...a11yProps(7)} disabled={disabledKey} />
           <Tab label="거래" {...a11yProps(8)} disabled={disabledKey} />
+          <Tab label="비트코인" {...a11yProps(8)} disabled={disabledKey} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -124,6 +126,9 @@ export default function BlockchainPage() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={8}>
         <TransactionView keys={keys} keyPair={genKeyPair} />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={8}>
+        <BitcoinView keys={keys} keyPair={genKeyPair} />
       </CustomTabPanel>
     </Box>
   );
