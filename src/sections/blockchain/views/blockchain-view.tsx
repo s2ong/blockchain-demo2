@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
@@ -73,7 +73,7 @@ const BlockChainView = () => {
   };
 
   return (
-    <Container>
+    <Box sx={{ m: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Blockchian
       </Typography>
@@ -88,7 +88,7 @@ const BlockChainView = () => {
           ))}
         </Stack>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

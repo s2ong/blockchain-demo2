@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import Container from "@mui/material/Container";
+
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
@@ -14,7 +15,7 @@ import BlockChain from "../block-chain";
 
 const DistributedView = () => {
   return (
-    <Container>
+    <Box sx={{ m: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Distributed
       </Typography>
@@ -26,7 +27,7 @@ const DistributedView = () => {
 
         <PeerBlockChain peerName="Peer C" initialBlocks={BLOCKS} />
       </Stack>
-    </Container>
+    </Box>
   );
 };
 

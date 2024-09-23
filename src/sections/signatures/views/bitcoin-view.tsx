@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 
 import { ec } from "elliptic";
 
-import Container from "@mui/material/Container";
+import Box from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 
-import { COINS } from "@/_mock/_blockchain";
+import { BITCOINS } from "@/_mock/_signatures";
 
-import { recalculateCoinBlockChain } from "@/utils/blockchain";
+import { IBitCoinBlock, IKey } from "@/types/sign";
 
-import { ICoinBlock } from "@/types/blockchain";
+import { recalculateBitCoinBlockChain } from "@/utils/blockchain";
 
 import BitcoinBlockChain from "../bitcoin-block-chain";
 
@@ -21,41 +21,60 @@ type Props = {
 };
 
 const BitcoinView = ({ keys, keyPair }: Props) => {
-  const tokens1 = COINS(1);
-  const tokens2 = COINS(2);
-  const tokens3 = COINS(3);
+  const blockchains1 = BITCOINS(1);
+  const blockchains2 = BITCOINS(2);
+  const blockchains3 = BITCOINS(3);
 
   return (
-    <Container>
+    <Box sx={{ m: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Coinbase
+        Bitcoin blockchain
       </Typography>
 
       <Stack spacing={1}>
-        <PeerTokenChain peerName="Peer A" initialBlocks={tokens1} />
+        <PeerBlockChain
+          peerName="Peer A"
+          initialBlocks={blockchains1}
+          keys={keys}
+          keyPair={keyPair}
+        />
 
-        <PeerTokenChain peerName="Peer B" initialBlocks={tokens2} />
+        <PeerBlockChain
+          peerName="Peer B"
+          initialBlocks={blockchains2}
+          keys={keys}
+          keyPair={keyPair}
+        />
 
-        <PeerTokenChain peerName="Peer C" initialBlocks={tokens3} />
+        <PeerBlockChain
+          peerName="Peer C"
+          initialBlocks={blockchains3}
+          keys={keys}
+          keyPair={keyPair}
+        />
       </Stack>
-    </Container>
+    </Box>
   );
 };
 
 export default BitcoinView;
 
-const PeerTokenChain = ({
+const PeerBlockChain = ({
   peerName,
   initialBlocks,
+  keys,
+  keyPair,
 }: {
   peerName: string;
-  initialBlocks: ICoinBlock[];
+  initialBlocks: IBitCoinBlock[];
+  keys: IKey | null;
+  keyPair: ec.KeyPair | null;
 }) => {
   const [blocks, setBlocks] = useState(initialBlocks);
 
-  const initializeHashes = (initialBlocks: ICoinBlock[]) => {
+  const initializeHashes = (initialBlocks: IBitCoinBlock[]) => {
     const updatedBlocks = [...initialBlocks];
-    const result = recalculateCoinBlockChain(updatedBlocks);
+    const result = recalculateBitCoinBlockChain(updatedBlocks);
     setBlocks(result);
   };
 
@@ -63,7 +82,7 @@ const PeerTokenChain = ({
     initializeHashes(initialBlocks);
   }, [initialBlocks]);
 
-  const handleUpdate = (updatedBlock: ICoinBlock) => {
+  const handleUpdate = (updatedBlock: IBitCoinBlock) => {
     const updatedBlocks = [...blocks];
     const blockIndex = updatedBlocks.findIndex(
       (block) => block.id === updatedBlock.id
@@ -72,7 +91,7 @@ const PeerTokenChain = ({
     if (blockIndex !== -1) {
       updatedBlocks[blockIndex] = { ...updatedBlock };
 
-      const recalculatedBlocks = recalculateCoinBlockChain(
+      const recalculatedBlocks = recalculateBitCoinBlockChain(
         updatedBlocks,
         blockIndex
       );
@@ -87,10 +106,12 @@ const PeerTokenChain = ({
         {peerName}
       </Typography>
       <Stack spacing={2} direction="row" sx={{ overflow: "auto", pb: 1 }}>
-        {blocks.map((block, index) => (
+        {blocks.map((block) => (
           <BitcoinBlockChain
             key={block.id}
             currentBlock={block}
+            keys={keys}
+            keyPair={keyPair}
             onChange={handleUpdate}
           />
         ))}

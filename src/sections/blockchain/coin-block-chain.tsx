@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { IBlock, ICoinBlock, ITokenBlockTxs } from "@/types/blockchain";
+import { ICoinBlock, ITokenBlockTxs } from "@/types/blockchain";
 
 import { getCointString, mine, sha256, updateState } from "@/utils/blockchain";
 

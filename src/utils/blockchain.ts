@@ -4,6 +4,7 @@ import {
   ITokenBlock,
   ITokenBlockTxs,
 } from "@/types/blockchain";
+import { IBitCoinBlock } from "@/types/sign";
 import CryptoJS from "crypto-js";
 /////////////////////////
 // global variable setup
@@ -116,7 +117,7 @@ interface IBlockBase {
   data?: string | any[];
 }
 
-const calculateBlockchain = <T extends IBlockBase>(
+export const calculateBlockchain = <T extends IBlockBase>(
   updatedBlocks: T[],
   startIndex: number = 0,
   getBlockData: (block: T) => string
@@ -186,5 +187,25 @@ export const recalculateCoinBlockChain = (
 ) => {
   return calculateBlockchain<ICoinBlock>(updatedBlocks, startIndex, (block) =>
     getCointString(block)
+  );
+};
+
+export const getBitCoinString = (block: IBitCoinBlock) => {
+  let data = `${block.coinbasevalue}${block.coinbaseto}`;
+  block.txs.forEach((tx) => {
+    data = `${data}${tx.value}${tx.from}${tx.to}${tx.seq}${tx.sig}`;
+  });
+  return data;
+};
+
+// 코인 블록체인의 데이터 처리 함수
+export const recalculateBitCoinBlockChain = (
+  updatedBlocks: IBitCoinBlock[],
+  startIndex: number = 0
+) => {
+  return calculateBlockchain<IBitCoinBlock>(
+    updatedBlocks,
+    startIndex,
+    (block) => getBitCoinString(block)
   );
 };

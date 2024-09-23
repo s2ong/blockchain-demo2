@@ -7,6 +7,10 @@ import { ec } from "elliptic";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import Typography from "@mui/material/Typography";
+
+import { IKey } from "@/types/sign";
 
 import { generateKeysInDecimal } from "@/utils/keygen";
 
@@ -38,7 +42,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -82,6 +86,11 @@ export default function BlockchainPage() {
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Typography sx={{ m: 1 }}>
+          <Link href="https://andersbrownworth.com/blockchain/" color="inherit">
+            Blockchain Demo (andres94)
+          </Link>
+        </Typography>
         <Tabs
           value={value}
           onChange={handleChange}
@@ -96,40 +105,42 @@ export default function BlockchainPage() {
           <Tab label="공개키와 개인키" {...a11yProps(6)} />
           <Tab label="서명" {...a11yProps(7)} disabled={disabledKey} />
           <Tab label="거래" {...a11yProps(8)} disabled={disabledKey} />
-          <Tab label="비트코인" {...a11yProps(8)} disabled={disabledKey} />
+          <Tab label="비트코인" {...a11yProps(9)} disabled={disabledKey} />
         </Tabs>
       </Box>
-      <CustomTabPanel value={value} index={0}>
-        <SHA256HashView />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <BlockView />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        <BlockChainView />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={3}>
-        <DistributedView />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={4}>
-        <TokenView />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={5}>
-        <CoinbaseView />
-      </CustomTabPanel>
+      <Box sx={{ width: "100%" }}>
+        <CustomTabPanel value={value} index={0}>
+          <SHA256HashView />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <BlockView />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={2}>
+          <BlockChainView />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={3}>
+          <DistributedView />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={4}>
+          <TokenView />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={5}>
+          <CoinbaseView />
+        </CustomTabPanel>
 
-      <CustomTabPanel value={value} index={6}>
-        <KeysView keys={keys} onUpdateKeys={updateKeyPair} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={7}>
-        <SignatureView keys={keys} keyPair={genKeyPair} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={8}>
-        <TransactionView keys={keys} keyPair={genKeyPair} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={8}>
-        <BitcoinView keys={keys} keyPair={genKeyPair} />
-      </CustomTabPanel>
+        <CustomTabPanel value={value} index={6}>
+          <KeysView keys={keys} onUpdateKeys={updateKeyPair} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={7}>
+          <SignatureView keys={keys} keyPair={genKeyPair} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={8}>
+          <TransactionView keys={keys} keyPair={genKeyPair} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={9}>
+          <BitcoinView keys={keys} keyPair={genKeyPair} />
+        </CustomTabPanel>
+      </Box>
     </Box>
   );
 }

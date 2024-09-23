@@ -5,6 +5,9 @@ import React, {
   useMemo,
   useEffect,
 } from "react";
+
+import { ec } from "elliptic";
+
 import {
   Card,
   CardContent,
@@ -15,19 +18,26 @@ import {
   Typography,
 } from "@mui/material";
 
-import { IBlock, ICoinBlock, ITokenBlockTxs } from "@/types/blockchain";
+import { IBitCoinBlock, IBitcoinBlockTx, IKey } from "@/types/sign";
 
-import { getCointString, mine, sha256, updateState } from "@/utils/blockchain";
+import {
+  getBitCoinString,
+  mine,
+  sha256,
+  updateState,
+} from "@/utils/blockchain";
 
-import HashOutput from "./hash-output";
-import TokenBlockChainItem from "./token-block-chain-item";
+import BitcoinBlockChainItem from "./bitcoin-block-chain-item";
+import HashOutput from "../blockchain/hash-output";
 
 interface BlockChainProps {
-  currentBlock: ICoinBlock;
-  onChange: (block: ICoinBlock) => void;
+  currentBlock: IBitCoinBlock;
+  onChange: (block: IBitCoinBlock) => void;
+  keys: IKey | null;
+  keyPair: ec.KeyPair | null;
 }
 
-const CoinBlockChain: React.FC<BlockChainProps> = ({
+const BitCoinBlockChain: React.FC<BlockChainProps> = ({
   currentBlock,
   onChange,
 }) => {
@@ -37,7 +47,7 @@ const CoinBlockChain: React.FC<BlockChainProps> = ({
 
   const isChain = status === "success";
 
-  const onUpdateHashStatus = (inputBlock: ICoinBlock) => {
+  const onUpdateHashStatus = (inputBlock: IBitCoinBlock) => {
     const hashStatus = updateState(inputBlock.hash || "");
     if (hashStatus === "valid") {
       setStatus("success");
@@ -54,8 +64,8 @@ const CoinBlockChain: React.FC<BlockChainProps> = ({
     onUpdateHashStatus(currentBlock);
   }, [currentBlock]);
 
-  const calculateBlock = (inputBlock: ICoinBlock) => {
-    const blockData = getCointString(inputBlock);
+  const calculateBlock = (inputBlock: IBitCoinBlock) => {
+    const blockData = getBitCoinString(inputBlock);
 
     const hashValue = sha256(blockData);
 
@@ -73,7 +83,7 @@ const CoinBlockChain: React.FC<BlockChainProps> = ({
   const handleMine = useCallback(() => {
     setMining(true);
 
-    const data = getCointString(block);
+    const data = getBitCoinString(block);
 
     const miningResult = mine({
       nonce: block.nonce,
@@ -111,7 +121,7 @@ const CoinBlockChain: React.FC<BlockChainProps> = ({
 
   const handleChangeTransaction = (
     txsIndex: number,
-    updateTransactions: ITokenBlockTxs
+    updateTransactions: IBitcoinBlockTx
   ) => {
     const updatedBlock = { ...currentBlock };
     updatedBlock.txs[txsIndex] = updateTransactions;
@@ -158,11 +168,12 @@ const CoinBlockChain: React.FC<BlockChainProps> = ({
               onChange={handleChange}
             />
           </Stack>
+
           <Typography variant="body2" component="h1" gutterBottom>
             송금
           </Typography>
           {block.txs.map((txs, index) => (
-            <TokenBlockChainItem
+            <BitcoinBlockChainItem
               key={`${block.id}-${index}`}
               txs={txs}
               txsIndex={index}
@@ -183,4 +194,4 @@ const CoinBlockChain: React.FC<BlockChainProps> = ({
   );
 };
 
-export default CoinBlockChain;
+export default BitCoinBlockChain;

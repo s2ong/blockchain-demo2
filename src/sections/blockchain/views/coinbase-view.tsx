@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
@@ -19,7 +19,7 @@ const CoinbaseView = () => {
   const tokens3 = COINS(3);
 
   return (
-    <Container>
+    <Box sx={{ m: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Coinbase
       </Typography>
@@ -31,7 +31,7 @@ const CoinbaseView = () => {
 
         <PeerTokenChain peerName="Peer C" initialBlocks={tokens3} />
       </Stack>
-    </Container>
+    </Box>
   );
 };
 
@@ -80,7 +80,7 @@ const PeerTokenChain = ({
         {peerName}
       </Typography>
       <Stack spacing={2} direction="row" sx={{ overflow: "auto", pb: 1 }}>
-        {blocks.map((block, index) => (
+        {blocks.map((block) => (
           <CoinBlockChain
             key={block.id}
             currentBlock={block}
