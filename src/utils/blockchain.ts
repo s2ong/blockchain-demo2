@@ -114,7 +114,7 @@ interface IBlockBase {
   id: number;
   nonce: number;
   hash?: string;
-  data?: string | any[];
+  data?: string | unknown[];
 }
 
 export const calculateBlockchain = <T extends IBlockBase>(

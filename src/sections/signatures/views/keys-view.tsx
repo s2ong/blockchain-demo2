@@ -7,8 +7,9 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
-import { convertPrivateKey, generateKeysInDecimal } from "@/utils/keygen";
+import { IKey } from "@/types/sign";
 
+import { convertPrivateKey, generateKeysInDecimal } from "@/utils/keygen";
 type Props = {
   keys: IKey | null;
   onUpdateKeys: (keys: IKey) => void;
@@ -30,7 +31,7 @@ const KeysView = ({ keys, onUpdateKeys }: Props) => {
   };
 
   const handleGenerateKeys = () => {
-    const { privateKey, publicKey, keyPair } = generateKeysInDecimal();
+    const { privateKey, publicKey } = generateKeysInDecimal();
 
     onUpdateKeys({ private: privateKey, public: publicKey });
 
