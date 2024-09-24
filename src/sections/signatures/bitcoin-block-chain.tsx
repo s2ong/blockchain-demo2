@@ -6,8 +6,6 @@ import React, {
   useEffect,
 } from "react";
 
-import { ec } from "elliptic";
-
 import {
   Card,
   CardContent,
@@ -18,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { IBitCoinBlock, IBitcoinBlockTx, IKey } from "@/types/sign";
+import { IBitCoinBlock, IBitcoinBlockTx } from "@/types/sign";
 
 import {
   getBitCoinString,
@@ -33,8 +31,6 @@ import HashOutput from "../blockchain/hash-output";
 interface BlockChainProps {
   currentBlock: IBitCoinBlock;
   onChange: (block: IBitCoinBlock) => void;
-  keys: IKey | null;
-  keyPair: ec.KeyPair | null;
 }
 
 const BitCoinBlockChain: React.FC<BlockChainProps> = ({

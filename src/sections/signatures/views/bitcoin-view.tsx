@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 
-import { ec } from "elliptic";
-
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
@@ -9,18 +7,13 @@ import Paper from "@mui/material/Paper";
 
 import { BITCOINS } from "@/_mock/_signatures";
 
-import { IBitCoinBlock, IKey } from "@/types/sign";
+import { IBitCoinBlock } from "@/types/sign";
 
 import { recalculateBitCoinBlockChain } from "@/utils/blockchain";
 
 import BitcoinBlockChain from "../bitcoin-block-chain";
 
-type Props = {
-  keys: IKey | null;
-  keyPair: ec.KeyPair | null;
-};
-
-const BitcoinView = ({ keys, keyPair }: Props) => {
+const BitcoinView = () => {
   const blockchains1 = BITCOINS(1);
   const blockchains2 = BITCOINS(2);
   const blockchains3 = BITCOINS(3);
@@ -32,26 +25,11 @@ const BitcoinView = ({ keys, keyPair }: Props) => {
       </Typography>
 
       <Stack spacing={1}>
-        <PeerBlockChain
-          peerName="Peer A"
-          initialBlocks={blockchains1}
-          keys={keys}
-          keyPair={keyPair}
-        />
+        <PeerBlockChain peerName="Peer A" initialBlocks={blockchains1} />
 
-        <PeerBlockChain
-          peerName="Peer B"
-          initialBlocks={blockchains2}
-          keys={keys}
-          keyPair={keyPair}
-        />
+        <PeerBlockChain peerName="Peer B" initialBlocks={blockchains2} />
 
-        <PeerBlockChain
-          peerName="Peer C"
-          initialBlocks={blockchains3}
-          keys={keys}
-          keyPair={keyPair}
-        />
+        <PeerBlockChain peerName="Peer C" initialBlocks={blockchains3} />
       </Stack>
     </Box>
   );
@@ -62,13 +40,9 @@ export default BitcoinView;
 const PeerBlockChain = ({
   peerName,
   initialBlocks,
-  keys,
-  keyPair,
 }: {
   peerName: string;
   initialBlocks: IBitCoinBlock[];
-  keys: IKey | null;
-  keyPair: ec.KeyPair | null;
 }) => {
   const [blocks, setBlocks] = useState(initialBlocks);
 
@@ -110,8 +84,6 @@ const PeerBlockChain = ({
           <BitcoinBlockChain
             key={block.id}
             currentBlock={block}
-            keys={keys}
-            keyPair={keyPair}
             onChange={handleUpdate}
           />
         ))}
