@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { ec } from "elliptic";
-
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
@@ -57,7 +55,7 @@ function a11yProps(index: number) {
 export default function BlockchainPage() {
   const [value, setValue] = useState(0);
   const [keys, setKeys] = useState<IKey | null>(null);
-  const [genKeyPair, setGenKeyPair] = useState<ec.KeyPair | null>(null);
+  // const [genKeyPair, setGenKeyPair] = useState<ec.KeyPair | null>(null);
 
   const disabledKey = keys?.private === "";
 
@@ -66,34 +64,38 @@ export default function BlockchainPage() {
   };
 
   const updateKeyPair = (keys: IKey) => {
-    setKeys({ private: keys.private, public: keys.public });
+    setKeys({
+      private: keys.private,
+      public: keys.public,
+      keyPair: keys?.keyPair,
+    });
   };
 
   const generateKeys = () => {
     const { privateKey, publicKey, keyPair } = generateKeysInDecimal();
 
-    setKeys({ private: privateKey, public: publicKey });
-
-    setGenKeyPair(keyPair);
+    if (privateKey && publicKey && keyPair) {
+      setKeys({ private: privateKey, public: publicKey, keyPair: keyPair });
+    }
   };
 
   useEffect(() => {
-    if (!keys) {
-      generateKeys();
-    }
-  }, [keys]);
+    generateKeys();
+  }, []);
 
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Typography sx={{ m: 1 }}>
           <Link href="https://andersbrownworth.com/blockchain/" color="inherit">
-            Blockchain Demo (andres94)
+            참고사이트: Blockchain Demo (anders94)
           </Link>
         </Typography>
         <Tabs
           value={value}
           onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
           aria-label="basic tabs example"
         >
           <Tab label="해시" {...a11yProps(0)} />
@@ -132,10 +134,10 @@ export default function BlockchainPage() {
           <KeysView keys={keys} onUpdateKeys={updateKeyPair} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={7}>
-          <SignatureView keys={keys} keyPair={genKeyPair} />
+          <SignatureView keys={keys} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={8}>
-          <TransactionView keys={keys} keyPair={genKeyPair} />
+          <TransactionView keys={keys} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={9}>
           <BitcoinView />

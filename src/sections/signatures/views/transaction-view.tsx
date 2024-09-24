@@ -1,6 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { ec } from "elliptic";
 import CryptoJS from "crypto-js";
 
 import Container from "@mui/material/Container";
@@ -19,10 +18,9 @@ import MessageSignature from "../message-signature";
 
 type Props = {
   keys: IKey | null;
-  keyPair: ec.KeyPair | null;
 };
 
-const SignatureView = ({ keys, keyPair }: Props) => {
+const SignatureView = ({ keys }: Props) => {
   const [message, setMessage] = useState<ITokenBlockTxs>({
     value: "20.00",
     from: "04bbbe956c94edcce682d1fdd10432ba8136b6c5af797ed174521011de1c7b2137b89eeac4b2fd5ea70a6e1274b897ba624d98b5b494312e0c93b2241279aa3b9d",
@@ -48,8 +46,8 @@ const SignatureView = ({ keys, keyPair }: Props) => {
 
     const binaryMessage = Buffer.from(messageHash, "hex");
 
-    if (keys && keyPair) {
-      const signature = keyPair.sign(binaryMessage);
+    if (keys?.keyPair) {
+      const signature = keys?.keyPair.sign(binaryMessage);
 
       // 서명을 DER 형식으로 변환 후, Hex 문자열로 변환
       const hexSignature = Buffer.from(signature.toDER()).toString("hex");

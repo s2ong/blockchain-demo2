@@ -1,6 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { ec } from "elliptic";
 import CryptoJS from "crypto-js";
 
 import Container from "@mui/material/Container";
@@ -18,21 +17,22 @@ import MessageSignature from "../message-signature";
 
 type Props = {
   keys: IKey | null;
-  keyPair: ec.KeyPair | null;
 };
 
-const SignatureView = ({ keys, keyPair }: Props) => {
+const SignatureView = ({ keys }: Props) => {
   const [message, setMessage] = useState("");
   const [signature, setSignature] = useState("");
-  const [publicKey, setPublicKey] = useState<string>();
 
   const [verification, setVerification] = useState<boolean>();
   const [verifyMessage, setVerifyMessage] = useState("");
+  const [verifyPublic, setVerifyPublic] = useState("");
   const [verifySignature, setVerifySignature] = useState("");
+
+  const keyPair = keys?.keyPair;
 
   useEffect(() => {
     if (keys) {
-      setPublicKey(keys?.public);
+      setVerifyPublic(keys.public);
     }
   }, [keys]);
 
@@ -41,7 +41,7 @@ const SignatureView = ({ keys, keyPair }: Props) => {
 
     const binaryMessage = Buffer.from(messageHash, "hex");
 
-    if (keys && keyPair) {
+    if (keyPair) {
       const signature = keyPair.sign(binaryMessage);
 
       // 서명을 DER 형식으로 변환 후, Hex 문자열로 변환
@@ -58,15 +58,14 @@ const SignatureView = ({ keys, keyPair }: Props) => {
   };
 
   const handleClickVerify = () => {
-    if (publicKey) {
-      const isSignatureValid = verifySignatureWithPublicKey(
-        verifyMessage,
-        verifySignature,
-        publicKey
-      );
-      console.log("Signature is valid:", isSignatureValid);
-      setVerification(isSignatureValid);
-    }
+    const isSignatureValid = verifySignatureWithPublicKey(
+      verifyMessage,
+      verifySignature,
+      verifyPublic
+    );
+
+    console.log("Signature is valid:", isSignatureValid);
+    setVerification(isSignatureValid);
   };
 
   return (
@@ -116,8 +115,8 @@ const SignatureView = ({ keys, keyPair }: Props) => {
           <TextField
             label="Public Key"
             fullWidth
-            value={publicKey}
-            onChange={(e) => setPublicKey(e.target.value)}
+            value={verifyPublic}
+            onChange={(e) => setVerifyPublic(e.target.value)}
           />
           <TextField
             label="Signature"

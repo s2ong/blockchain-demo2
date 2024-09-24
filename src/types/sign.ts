@@ -1,6 +1,9 @@
+import { ec } from "elliptic";
+
 export type IKey = {
   private: string;
   public: string;
+  keyPair?: ec.KeyPair | null;
 };
 
 export type IBitcoinBlockTx = {

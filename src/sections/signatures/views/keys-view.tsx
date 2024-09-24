@@ -31,9 +31,9 @@ const KeysView = ({ keys, onUpdateKeys }: Props) => {
   };
 
   const handleGenerateKeys = () => {
-    const { privateKey, publicKey } = generateKeysInDecimal();
+    const { privateKey, publicKey, keyPair } = generateKeysInDecimal();
 
-    onUpdateKeys({ private: privateKey, public: publicKey });
+    onUpdateKeys({ private: privateKey, public: publicKey, keyPair });
 
     setPrivateKey(privateKey);
     setPublicKey(publicKey);
