@@ -81,7 +81,7 @@ export default function BlockchainPage() {
     if (!keys) {
       generateKeys();
     }
-  }, []);
+  }, [keys]);
 
   return (
     <Box sx={{ width: "100%" }}>
