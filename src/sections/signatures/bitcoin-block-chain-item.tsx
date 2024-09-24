@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 
 import CryptoJS from "crypto-js";
 import { ec as EC } from "elliptic";
@@ -6,6 +6,7 @@ import { ec as EC } from "elliptic";
 import { TextField, Stack, Paper } from "@mui/material";
 
 import { IBitcoinBlockTx } from "@/types/sign";
+import { PRIVATE_KEYS } from "@/_mock/_signatures";
 
 // elliptic curve 객체 생성
 const ec = new EC("secp256k1");
@@ -21,6 +22,8 @@ const BitcoinBlockChainItem: React.FC<Props> = ({
   txsIndex,
   onChange,
 }) => {
+  const [status, setStatus] = useState<boolean | null>(null);
+
   const { value, from, to, seq, sig } = txs;
 
   const getBitcoinTxString = (block: IBitcoinBlockTx) => {
@@ -34,10 +37,26 @@ const BitcoinBlockChainItem: React.FC<Props> = ({
 
     const binaryMessage = Buffer.from(messageHash, "hex");
 
-    const publicKey = ec.keyFromPublic(tx.from, "hex");
-    console.log(publicKey);
+    const result = PRIVATE_KEYS.find((t) => t.public === tx.from);
 
-    console.log("Signature is valid:", publicKey.verify(binaryMessage, tx.sig));
+    if (result) {
+      // private key로부터 key pair를 생성
+      const keyPair = ec.keyFromPrivate(result.private, "hex");
+
+      // 서명을 검증할 public key를 가져옴
+      const publicKey = keyPair.getPublic("hex");
+
+      console.log("Public Key:", publicKey);
+
+      // 트랜잭션의 서명을 검증
+      const isValid = keyPair.verify(binaryMessage, tx.sig);
+
+      console.log("Signature is valid:", isValid);
+      setStatus(isValid);
+    } else {
+      console.log("Public key not found for the given 'from' address.");
+      setStatus(false);
+    }
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +102,6 @@ const BitcoinBlockChainItem: React.FC<Props> = ({
             name="seq"
             value={seq}
             onChange={handleChange}
-            sx={{ width: 80 }}
             size="small"
           />
           <TextField
@@ -93,6 +111,11 @@ const BitcoinBlockChainItem: React.FC<Props> = ({
             onChange={handleChange}
             size="small"
             fullWidth
+            sx={{
+              input: {
+                color: status === false ? "red" : "black",
+              },
+            }}
           />
         </Stack>
       </Paper>

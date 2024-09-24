@@ -138,7 +138,7 @@ export default function BlockchainPage() {
           <TransactionView keys={keys} keyPair={genKeyPair} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={9}>
-          <BitcoinView keys={keys} keyPair={genKeyPair} />
+          <BitcoinView />
         </CustomTabPanel>
       </Box>
     </Box>
